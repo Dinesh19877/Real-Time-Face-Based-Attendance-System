@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Employee Attendance List</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <style>
+        body, html {
+            margin: 0; padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+        .container {
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .table-responsive {
+            margin-top: 20px;
+            flex-grow: 1;
+        }
+        .table thead th {
+            vertical-align: middle;
+            text-align: center;
+            background-color: #007bff;
+            color: white;
+        }
+        .table tbody tr:hover {
+            background-color: #e9ecef;
+        }
+        .table td, .table th {
+            vertical-align: middle;
+            text-align: center;
+        }
+        .heading {
+            text-align: center;
+            margin: 40px 0;
+            color: #007bff;
+        }
+        .footer {
+            margin-top: auto;
+            padding: 10px 0;
+            text-align: left;
+        }
+        .back-icon {
+            padding: 10px;
+            font-size: 1.5em;
+            color: #007bff;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .back-icon:hover {
+            color: #0056b3;
+        }
+        .btn-custom {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+        /* Status colors */
+        .status-None {
+            color: gray;
+            font-weight: bold;
+        }
+        .status-Half {
+            color: orange;
+            font-weight: bold;
+        }
+        .status-Full {
+            color: green;
+            font-weight: bold;
+        }
+        .status-Overtime {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="heading">Employee Attendance Records</h2>
+    <form method="get" class="filter-container d-flex mb-3 gap-2">
+        <input type="text" name="search" class="form-control" placeholder="Search for Employees..." value="{{ search_query }}" />
+        <input type="date" name="attendance_date" class="form-control" value="{{ date_filter }}" />
+        <button class="btn btn-custom" type="submit"><i class="fas fa-filter"></i> Filter</button>
+    </form>
+
+    <div class="table-responsive attendance-table">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Employee Image</th>
+                    <th>Employee Name</th>
+                    <th>Attendance Date</th>
+                    <th>Check-in Time</th>
+                    <th>Check-out Time</th>
+                    <th>Inside Time</th>
+                    <th>Outside Time</th>
+                    <th>Status</th>
+                    <th>Overtime</th>
+                    <th>Logs</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in employee_attendance_data %}
+                    {% for attendance in data.attendance_records %}
+                        <tr>
+                            <td>
+                                {% if data.employee.image %}
+                                    <img src="{{ data.employee.image.url }}" alt="{{ data.employee.name }}" style="width: 50px; height: 50px; border-radius: 50%;" />
+                                {% else %}
+                                    No Image
+                                {% endif %}
+                            </td>
+                            <td>{{ data.employee.name }}</td>
+                            <td>{{ attendance.date }}</td>
+                            <td>{{ attendance.check_in_time|date:"h:i:s A" }}</td>
+                            <td>{{ attendance.check_out_time|date:"h:i:s A" }}</td>
+                            <td>
+                                {% if attendance.check_in_time and attendance.check_out_time %}
+                                    {{ attendance.formatted_office_time }}
+                                {% else %}
+                                    Not Checked Out
+                                {% endif %}
+                            </td>
+                            <td>{{ attendance.extra_time }}</td>
+                            <td class="status-{{ attendance.attendance_status }}">
+                                {% if attendance.check_in_time and attendance.check_out_time %}
+                                    {{ attendance.attendance_status }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if attendance.attendance_status == "Overtime" %}
+                                    {{ attendance.get_overtime_duration }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'employee_logs' data.employee.Employee_Id %}" title="View Logs">
+                                    <i class="fas fa-file-alt"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer">
+        <i class="fas fa-arrow-left back-icon" onclick="location.href='/'"></i>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

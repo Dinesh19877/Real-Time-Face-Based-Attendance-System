@@ -1,0 +1,244 @@
+<!-- attendance_chart.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Attendance Summary</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 30px;
+            margin-top: 20px;
+        }
+
+        h1 {
+            color: #1e293b;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        .nav-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-button:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #3b82f6;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="nav-button" onclick="location.href='{% url 'home' %}'">
+            ← Back to Home
+        </button>
+        <h1>Attendance Summary</h1>
+        <p class="subtitle">Overview of attendance records</p>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Today</div>
+                <div class="stat-value">{{ today_count }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">This Month</div>
+                <div class="stat-value">{{ month_count }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">This Year</div>
+                <div class="stat-value">{{ year_count }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total</div>
+                <div class="stat-value">{{ total_count }}</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="attendanceBarChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('attendanceBarChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Today', 'This Month', 'This Year', 'Total'],
+                datasets: [{
+                    label: 'Attendance Count',
+                    data: [
+                        {{ today_count }},
+                        {{ month_count }},
+                        {{ year_count }},
+                        {{ total_count }}
+                    ],
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(16, 185, 129, 0.7)',
+                        'rgba(245, 158, 11, 0.7)',
+                        'rgba(239, 68, 68, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(16, 185, 129, 1)',
+                        'rgba(245, 158, 11, 1)',
+                        'rgba(239, 68, 68, 1)'
+                    ],
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    barPercentage: 0.7
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Attendance Count',
+                            color: '#64748b'
+                        },
+                        ticks: {
+                            color: '#64748b'
+                        },
+                        grid: {
+                            color: 'rgba(226, 232, 240, 0.5)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time Period',
+                            color: '#64748b'
+                        },
+                        ticks: {
+                            color: '#64748b'
+                        },
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: '#1e293b',
+                        titleColor: '#f8fafc',
+                        bodyColor: '#e2e8f0',
+                        borderColor: '#334155',
+                        borderWidth: 1,
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                return `Attendance: ${context.raw}`;
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+    </script>
+</body>
+</html>

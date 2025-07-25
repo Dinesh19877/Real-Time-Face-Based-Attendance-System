@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Logs</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+        .container {
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .heading {
+            text-align: center;
+            margin: 30px 0 20px;
+            color: #007bff;
+        }
+        .table-responsive {
+            flex-grow: 1;
+        }
+        .table thead th {
+            vertical-align: middle;
+            text-align: center;
+            background-color: #007bff;
+            color: white;
+        }
+        .table td, .table th {
+            vertical-align: middle;
+            text-align: center;
+        }
+        .table tbody tr:hover {
+            background-color: #e9ecef;
+        }
+        .back-icon {
+            font-size: 1.5rem;
+            color: #007bff;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .back-icon:hover {
+            color: #0056b3;
+        }
+        .footer {
+            margin-top: auto;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="footer">
+        <i class="fas fa-arrow-left back-icon" onclick="location.href='{% url 'Employee_attendance_list' %}'"></i>
+
+    </div>
+
+    <h2 class="heading">Logs for Employee Name: {{ employee.name }}</h2>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover mt-3">
+            <thead>
+                <tr>
+                    <th>Employee ID</th>
+                    <th>Action</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>{{ log.attendance.employee.Employee_Id }}</td>
+                    <td>
+                        {% if log.action == 'checkin' %}
+                            <span class="text-success"><i class="fas fa-sign-in-alt"></i> Check-in</span>
+                        {% elif log.action == 'checkout' %}
+                            <span class="text-danger"><i class="fas fa-sign-out-alt"></i> Check-out</span>
+                        {% else %}
+                            {{ log.action }}
+                        {% endif %}
+                    </td>
+                    <td>{{ log.timestamp|date:"Y-m-d h:i:s A" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No logs found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

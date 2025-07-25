@@ -1,0 +1,21 @@
+<h2>Welcome {{ employee.name }}</h2>
+<p><a href="{% url 'logout' %}">Logout</a></p>
+
+<table border="1">
+    <tr>
+        <th>Date</th>
+        <th>Check In</th>
+        <th>Check Out</th>
+        <th>Extra Time</th>
+        <th>Total Inside Time</th>
+    </tr>
+    {% for a in records %}
+    <tr>
+        <td>{{ a.date }}</td>
+        <td>{{ a.check_in_time|date:"h:i:s A" }}</td>
+        <td>{{ a.check_out_time|date:"h:i:s A" }}</td>
+        <td>{{ a.extra_time }}</td>
+        <td>{{ a.formatted_duration }}</td>
+    </tr>
+    {% endfor %}
+</table>
