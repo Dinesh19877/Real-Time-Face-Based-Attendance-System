@@ -111,7 +111,7 @@ python manage.py runserver
 
 ---
 
-## 📁 Project Structure (Optional)
+## 📁 Project Structure
 
 ```
 ├── app1/
